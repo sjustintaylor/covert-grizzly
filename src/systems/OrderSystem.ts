@@ -5,17 +5,20 @@ export interface Command {
   execute(): void
   getType(): OrderType
   getDuration(): number
+  getPreparationDuration(): number
 }
 
 export class MoveCommand implements Command {
   private boat: Boat
   private orderType: OrderType
   private duration: number
+  private preparationDuration: number
 
-  constructor(boat: Boat, orderType: OrderType, duration: number = 3000) {
+  constructor(boat: Boat, orderType: OrderType, duration: number = 3000, preparationDuration: number = 2000) {
     this.boat = boat
     this.orderType = orderType
     this.duration = duration
+    this.preparationDuration = preparationDuration
   }
 
   execute(): void {
@@ -29,12 +32,20 @@ export class MoveCommand implements Command {
   getDuration(): number {
     return this.duration
   }
+
+  getPreparationDuration(): number {
+    return this.preparationDuration
+  }
 }
+
+export type OrderSystemState = 'IDLE' | 'PREPARING' | 'EXECUTING'
 
 export class OrderSystem {
   private boat: Boat
   private commandQueue: Command[] = []
-  private isProcessing: boolean = false
+  private currentCommand: Command | null = null
+  private state: OrderSystemState = 'IDLE'
+  private preparationStartTime: number = 0
 
   constructor(boat: Boat) {
     this.boat = boat
@@ -50,18 +61,39 @@ export class OrderSystem {
     this.addCommand(command)
   }
 
+  public update(): void {
+    if (this.state === 'PREPARING') {
+      this.updatePreparation()
+    } else if (this.state === 'EXECUTING') {
+      this.updateExecution()
+    }
+  }
+
   private processNextCommand(): void {
-    if (this.isProcessing || this.commandQueue.length === 0) {
+    if (this.state !== 'IDLE' || this.commandQueue.length === 0) {
       return
     }
 
-    this.isProcessing = true
-    const command = this.commandQueue.shift()!
-    command.execute()
-    this.isProcessing = false
+    this.currentCommand = this.commandQueue.shift()!
+    this.state = 'PREPARING'
+    this.preparationStartTime = Date.now()
+  }
 
-    if (this.commandQueue.length > 0) {
-      setTimeout(() => this.processNextCommand(), 100)
+  private updatePreparation(): void {
+    if (!this.currentCommand) return
+
+    const elapsed = Date.now() - this.preparationStartTime
+    if (elapsed >= this.currentCommand.getPreparationDuration()) {
+      this.state = 'EXECUTING'
+      this.currentCommand.execute()
+    }
+  }
+
+  private updateExecution(): void {
+    if (!this.boat.getCurrentOrderType()) {
+      this.state = 'IDLE'
+      this.currentCommand = null
+      this.processNextCommand()
     }
   }
 
@@ -71,13 +103,30 @@ export class OrderSystem {
 
   public clearQueue(): void {
     this.commandQueue = []
+    this.state = 'IDLE'
+    this.currentCommand = null
   }
 
   public getCurrentOrder(): OrderType | null {
+    if (this.state === 'PREPARING' && this.currentCommand) {
+      return this.currentCommand.getType()
+    }
     return this.boat.getCurrentOrderType()
   }
 
   public getOrderProgress(): number {
+    if (this.state === 'PREPARING' && this.currentCommand) {
+      const elapsed = Date.now() - this.preparationStartTime
+      return Math.min(elapsed / this.currentCommand.getPreparationDuration(), 1)
+    }
     return this.boat.getOrderProgress()
+  }
+
+  public getSystemState(): OrderSystemState {
+    return this.state
+  }
+
+  public isInPreparation(): boolean {
+    return this.state === 'PREPARING'
   }
 }

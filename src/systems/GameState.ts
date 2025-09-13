@@ -30,6 +30,7 @@ export class GameState {
       return
     }
 
+    this.orderSystem.update()
     this.boat.update(deltaTime)
     this.target.update(deltaTime)
 

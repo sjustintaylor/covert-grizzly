@@ -7,6 +7,7 @@ export class UIController {
   private gameState: GameState
 
   private progressBar: HTMLElement
+  private progressLabel: HTMLElement
   private currentOrderDisplay: HTMLElement
   private gameStateDisplay: HTMLElement
 
@@ -15,6 +16,7 @@ export class UIController {
     this.gameState = gameState
 
     this.progressBar = document.getElementById('order-progress-fill')!
+    this.progressLabel = document.getElementById('order-progress-label')!
     this.currentOrderDisplay = document.getElementById('current-order')!
     this.gameStateDisplay = document.getElementById('game-state')!
 
@@ -67,13 +69,28 @@ export class UIController {
 
   private updateProgressBar(): void {
     const progress = this.orderSystem.getOrderProgress()
+    const isInPreparation = this.orderSystem.isInPreparation()
+
     this.progressBar.style.width = `${progress * 100}%`
+
+    if (isInPreparation) {
+      this.progressBar.style.background = 'linear-gradient(90deg, #F59E0B, #D97706)'
+      this.progressLabel.textContent = 'Preparing Order...'
+    } else if (this.orderSystem.getCurrentOrder()) {
+      this.progressBar.style.background = 'linear-gradient(90deg, #3B82F6, #2563EB)'
+      this.progressLabel.textContent = 'Executing Order...'
+    } else {
+      this.progressLabel.textContent = 'Order Progress'
+    }
   }
 
   private updateCurrentOrder(): void {
     const currentOrder = this.orderSystem.getCurrentOrder()
+    const isInPreparation = this.orderSystem.isInPreparation()
+
     if (currentOrder) {
-      this.currentOrderDisplay.textContent = `Current Order: ${this.formatOrderType(currentOrder)}`
+      const prefix = isInPreparation ? 'Preparing:' : 'Executing:'
+      this.currentOrderDisplay.textContent = `${prefix} ${this.formatOrderType(currentOrder)}`
     } else {
       this.currentOrderDisplay.textContent = 'Current Order: None'
     }
