@@ -4,10 +4,46 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Moving Rectangle Canvas</title>
+    <title>Captain's Log - Naval Orders Game</title>
   </head>
   <body>
-    <canvas id="canvas" width="800" height="600"></canvas>
+    <div id="game-container">
+      <div id="canvas-container">
+        <canvas id="canvas" width="800" height="400"></canvas>
+      </div>
+
+      <div id="controls-container">
+        <div id="speed-controls">
+          <button id="no-speed" class="order-btn speed-btn">No speed</button>
+          <button id="half-speed" class="order-btn speed-btn">Half speed</button>
+          <button id="full-speed" class="order-btn speed-btn">Full speed</button>
+        </div>
+
+        <div id="progress-container">
+          <div id="order-progress-label">Order progress bar</div>
+          <div id="order-progress-bar">
+            <div id="order-progress-fill"></div>
+          </div>
+        </div>
+
+        <div id="turn-controls">
+          <div id="turn-controls-row-1">
+            <button id="half-left" class="order-btn turn-btn">1/2 Left</button>
+            <button id="half-right" class="order-btn turn-btn">1/2 Right</button>
+          </div>
+          <div id="turn-controls-row-2">
+            <button id="full-left" class="order-btn turn-btn">Full Left</button>
+            <button id="full-right" class="order-btn turn-btn">Full Right</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="game-status">
+        <div id="current-order">Current Order: None</div>
+        <div id="game-state">Navigate the boat to the target!</div>
+      </div>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

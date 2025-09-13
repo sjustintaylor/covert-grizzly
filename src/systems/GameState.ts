@@ -1,0 +1,156 @@
+import { Boat } from '../entities/Boat'
+import { Target } from '../entities/Target'
+import { OrderSystem } from './OrderSystem'
+
+export enum GameStatus {
+  PLAYING = 'PLAYING',
+  WON = 'WON',
+  PAUSED = 'PAUSED'
+}
+
+export class GameState {
+  public boat: Boat
+  public target: Target
+  public orderSystem: OrderSystem
+  public status: GameStatus = GameStatus.PLAYING
+  public score: number = 0
+  public gameStartTime: number
+
+  private canvasWidth: number
+  private canvasHeight: number
+
+  constructor(canvasWidth: number, canvasHeight: number) {
+    this.canvasWidth = canvasWidth
+    this.canvasHeight = canvasHeight
+    this.gameStartTime = Date.now()
+
+    this.boat = new Boat(canvasWidth / 2, canvasHeight - 80)
+    this.target = new Target(canvasWidth / 2, 60, canvasWidth)
+    this.orderSystem = new OrderSystem(this.boat)
+  }
+
+  public update(deltaTime: number): void {
+    if (this.status !== GameStatus.PLAYING) {
+      return
+    }
+
+    this.boat.update(deltaTime)
+    this.target.update(deltaTime)
+
+    this.keepBoatInBounds()
+    this.checkCollisions()
+  }
+
+  public render(ctx: CanvasRenderingContext2D): void {
+    ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+
+    this.drawGameCanvas(ctx)
+    this.target.render(ctx)
+    this.boat.render(ctx)
+
+    if (this.status === GameStatus.WON) {
+      this.drawWinMessage(ctx)
+    }
+  }
+
+  private drawGameCanvas(ctx: CanvasRenderingContext2D): void {
+    ctx.fillStyle = '#E6F3FF'
+    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
+
+    const pattern = ctx.createPattern(this.createWaterPattern(), 'repeat')
+    if (pattern) {
+      ctx.fillStyle = pattern
+      ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
+    }
+
+    ctx.strokeStyle = '#2C3E50'
+    ctx.lineWidth = 2
+    ctx.strokeRect(0, 0, this.canvasWidth, this.canvasHeight)
+
+    ctx.fillStyle = '#34495E'
+    ctx.font = '16px Arial'
+    ctx.fillText('Game canvas', this.canvasWidth / 2 - 50, this.canvasHeight / 2)
+  }
+
+  private createWaterPattern(): HTMLCanvasElement {
+    const patternCanvas = document.createElement('canvas')
+    patternCanvas.width = 20
+    patternCanvas.height = 20
+    const patternCtx = patternCanvas.getContext('2d')!
+
+    patternCtx.strokeStyle = '#D4EDDA'
+    patternCtx.lineWidth = 1
+    patternCtx.beginPath()
+    patternCtx.moveTo(0, 0)
+    patternCtx.lineTo(20, 20)
+    patternCtx.moveTo(20, 0)
+    patternCtx.lineTo(0, 20)
+    patternCtx.stroke()
+
+    return patternCanvas
+  }
+
+  private keepBoatInBounds(): void {
+    const margin = 10
+
+    if (this.boat.position.x - this.boat.width / 2 < margin) {
+      this.boat.position.x = margin + this.boat.width / 2
+      this.boat.velocity.x = 0
+    }
+
+    if (this.boat.position.x + this.boat.width / 2 > this.canvasWidth - margin) {
+      this.boat.position.x = this.canvasWidth - margin - this.boat.width / 2
+      this.boat.velocity.x = 0
+    }
+
+    if (this.boat.position.y - this.boat.height / 2 < margin) {
+      this.boat.position.y = margin + this.boat.height / 2
+      this.boat.velocity.y = 0
+    }
+
+    if (this.boat.position.y + this.boat.height / 2 > this.canvasHeight - margin) {
+      this.boat.position.y = this.canvasHeight - margin - this.boat.height / 2
+      this.boat.velocity.y = 0
+    }
+  }
+
+  private checkCollisions(): void {
+    if (this.target.checkCollision(this.boat)) {
+      this.status = GameStatus.WON
+      this.score = Math.max(0, 1000 - Math.floor((Date.now() - this.gameStartTime) / 100))
+    }
+  }
+
+  private drawWinMessage(ctx: CanvasRenderingContext2D): void {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
+    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
+
+    ctx.fillStyle = '#00FF00'
+    ctx.font = 'bold 48px Arial'
+    ctx.textAlign = 'center'
+    ctx.fillText('TARGET REACHED!', this.canvasWidth / 2, this.canvasHeight / 2 - 40)
+
+    ctx.fillStyle = '#FFFFFF'
+    ctx.font = '24px Arial'
+    ctx.fillText(`Score: ${this.score}`, this.canvasWidth / 2, this.canvasHeight / 2 + 20)
+
+    ctx.font = '18px Arial'
+    ctx.fillText('Press R to restart', this.canvasWidth / 2, this.canvasHeight / 2 + 60)
+
+    ctx.textAlign = 'left'
+  }
+
+  public reset(): void {
+    this.status = GameStatus.PLAYING
+    this.score = 0
+    this.gameStartTime = Date.now()
+
+    this.boat = new Boat(this.canvasWidth / 2, this.canvasHeight - 80)
+    this.target = new Target(this.canvasWidth / 2, 60, this.canvasWidth)
+    this.orderSystem = new OrderSystem(this.boat)
+  }
+
+  public getGameTime(): number {
+    return Date.now() - this.gameStartTime
+  }
+}
