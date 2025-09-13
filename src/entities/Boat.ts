@@ -26,7 +26,16 @@ export class Boat {
   public currentOrder: Order | null = null;
   public orderQueue: Order[] = [];
 
+  // Physics state
+  public rotation: number = 0; // angle in radians
+  public angularVelocity: number = 0; // radians per second
+  public currentSpeed: number = 0; // current forward speed
+  public targetSpeed: number = 0; // target speed to reach
+
   private readonly maxSpeed: number = 100;
+  private readonly maxAngularVelocity: number = 2.5; // radians per second
+  private readonly speedAcceleration: number = 120; // units per second^2
+  private readonly angularDamping: number = 0.85; // damping factor for angular velocity
 
   constructor(x: number, y: number) {
     this.position = { x, y };
@@ -51,81 +60,135 @@ export class Boat {
     if (!this.currentOrder && this.orderQueue.length > 0) {
       this.currentOrder = this.orderQueue.shift()!;
       this.currentOrder.startTime = Date.now();
+      this.applyOrder(this.currentOrder);
     }
 
     if (this.currentOrder) {
       const elapsed = Date.now() - this.currentOrder.startTime;
       if (elapsed >= this.currentOrder.duration) {
+        // Turn orders expire and stop turning
+        if (this.isTurnOrder(this.currentOrder.type)) {
+          this.angularVelocity = 0;
+        }
         this.currentOrder = null;
       }
     }
   }
 
-  private updateMovement(deltaTime: number): void {
-    if (!this.currentOrder) {
-      this.velocity.x *= 0.95;
-      this.velocity.y *= 0.95;
-      this.position.x += (this.velocity.x * deltaTime) / 1000;
-      this.position.y += (this.velocity.y * deltaTime) / 1000;
-      return;
-    }
-
-    const speedMultiplier = this.getSpeedMultiplier();
-    const turnMultiplier = this.getTurnMultiplier();
-
-    switch (this.currentOrder.type) {
+  private applyOrder(order: Order): void {
+    switch (order.type) {
       case "NO_SPEED":
-        this.velocity.x *= 0.9;
-        this.velocity.y *= 0.9;
+        this.targetSpeed = 0;
         break;
       case "HALF_SPEED":
-        this.velocity.y = -this.maxSpeed * speedMultiplier * 0.5;
+        this.targetSpeed = this.maxSpeed * 0.5;
         break;
       case "FULL_SPEED":
-        this.velocity.y = -this.maxSpeed * speedMultiplier;
+        this.targetSpeed = this.maxSpeed;
         break;
       case "HALF_LEFT":
-        this.velocity.x = -this.maxSpeed * turnMultiplier * 0.5;
+        this.angularVelocity = -this.maxAngularVelocity * 0.5;
         break;
       case "FULL_LEFT":
-        this.velocity.x = -this.maxSpeed * turnMultiplier;
+        this.angularVelocity = -this.maxAngularVelocity;
         break;
       case "HALF_RIGHT":
-        this.velocity.x = this.maxSpeed * turnMultiplier * 0.5;
+        this.angularVelocity = this.maxAngularVelocity * 0.5;
         break;
       case "FULL_RIGHT":
-        this.velocity.x = this.maxSpeed * turnMultiplier;
+        this.angularVelocity = this.maxAngularVelocity;
         break;
     }
-
-    this.position.x += (this.velocity.x * deltaTime) / 1000;
-    this.position.y += (this.velocity.y * deltaTime) / 1000;
   }
 
-  private getSpeedMultiplier(): number {
-    return 1.0;
+  private updateMovement(deltaTime: number): void {
+    const dt = deltaTime / 1000; // Convert to seconds
+
+    // Update speed (persistent until new speed order)
+    this.updateSpeed(dt);
+
+    // Update rotation from current order (temporary turn orders)
+    this.updateRotation(dt);
+
+    // Calculate forward velocity based on rotation and current speed
+    this.velocity.x = Math.sin(this.rotation) * this.currentSpeed;
+    this.velocity.y = -Math.cos(this.rotation) * this.currentSpeed; // Negative Y is up
+
+    // Update position
+    this.position.x += this.velocity.x * dt;
+    this.position.y += this.velocity.y * dt;
   }
 
-  private getTurnMultiplier(): number {
-    return 1.0;
+  private updateSpeed(dt: number): void {
+    // Gradually accelerate/decelerate toward target speed
+    if (Math.abs(this.targetSpeed - this.currentSpeed) > 1) {
+      const speedDiff = this.targetSpeed - this.currentSpeed;
+      const acceleration = Math.sign(speedDiff) * this.speedAcceleration * dt;
+      this.currentSpeed += acceleration;
+
+      // Clamp to target speed if we've overshot
+      if (Math.sign(speedDiff) !== Math.sign(this.targetSpeed - this.currentSpeed)) {
+        this.currentSpeed = this.targetSpeed;
+      }
+    } else {
+      this.currentSpeed = this.targetSpeed;
+    }
+  }
+
+  private updateRotation(dt: number): void {
+    // Apply current angular velocity
+    this.rotation += this.angularVelocity * dt;
+
+    // Keep rotation in 0 to 2π range
+    this.rotation = ((this.rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+
+    // Apply damping when no turn order is active
+    if (!this.currentOrder || !this.isTurnOrder(this.currentOrder.type)) {
+      this.angularVelocity *= this.angularDamping;
+      if (Math.abs(this.angularVelocity) < 0.01) {
+        this.angularVelocity = 0;
+      }
+    }
+  }
+
+  private isTurnOrder(orderType: OrderType): boolean {
+    return orderType === "HALF_LEFT" || orderType === "FULL_LEFT" ||
+           orderType === "HALF_RIGHT" || orderType === "FULL_RIGHT";
   }
 
   public render(ctx: CanvasRenderingContext2D): void {
-    ctx.fillStyle = "#FF69B4";
-    ctx.fillRect(
-      this.position.x - this.width / 2,
-      this.position.y - this.height / 2,
-      this.width,
-      this.height
-    );
+    ctx.save();
 
+    // Translate to boat position and rotate
+    ctx.translate(this.position.x, this.position.y);
+    ctx.rotate(this.rotation);
+
+    // Draw boat hull (main body)
+    ctx.fillStyle = "#FF69B4";
+    ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+
+    // Draw boat cabin (inner rectangle)
     ctx.fillStyle = "#FF1493";
-    ctx.fillRect(
-      this.position.x - this.width / 2 + 5,
-      this.position.y - this.height / 2 + 5,
-      this.width - 10,
-      this.height - 10
-    );
+    ctx.fillRect(-this.width / 2 + 5, -this.height / 2 + 5, this.width - 10, this.height - 10);
+
+    // Draw bow (pointed front)
+    ctx.fillStyle = "#FF1493";
+    ctx.beginPath();
+    ctx.moveTo(0, -this.height / 2);
+    ctx.lineTo(-8, -this.height / 2 + 12);
+    ctx.lineTo(8, -this.height / 2 + 12);
+    ctx.closePath();
+    ctx.fill();
+
+    // Draw direction indicator (small line at front)
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, -this.height / 2 + 2);
+    ctx.lineTo(0, -this.height / 2 + 10);
+    ctx.stroke();
+
+    ctx.restore();
   }
 
   public getOrderProgress(): number {
