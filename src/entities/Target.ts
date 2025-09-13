@@ -2,7 +2,7 @@ import type { Position } from './Boat'
 
 export class Target {
   public position: Position
-  public readonly radius: number = 25
+  public readonly radius: number = 35
   private velocity: number = 30
   private direction: number = 1
   private canvasWidth: number
