@@ -70,6 +70,8 @@ export class Boat {
         if (this.isTurnOrder(this.currentOrder.type)) {
           this.angularVelocity = 0;
         }
+        // Both speed and turn orders clear when completed
+        // Speed effects persist via targetSpeed, turn effects stop via angularVelocity = 0
         this.currentOrder = null;
       }
     }
