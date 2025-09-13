@@ -1,4 +1,5 @@
-import { Boat, OrderType } from '../entities/Boat'
+import { Boat } from '../entities/Boat'
+import type { OrderType } from '../entities/Boat'
 
 export interface Command {
   execute(): void

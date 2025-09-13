@@ -1,38 +1,21 @@
 import './style.css'
 import * as MainLoop from 'mainloop.js'
+import { GameState } from './systems/GameState'
+import { UIController } from './ui/UIController'
 
 const canvas = document.querySelector<HTMLCanvasElement>('#canvas')!
 const ctx = canvas.getContext('2d')!
 
-interface Rectangle {
-  x: number
-  y: number
-  width: number
-  height: number
-  speed: number
-}
-
-const rectangle: Rectangle = {
-  x: 350,
-  y: 0,
-  width: 100,
-  height: 50,
-  speed: 60
-}
+const gameState = new GameState(canvas.width, canvas.height)
+const uiController = new UIController(gameState.orderSystem, gameState)
 
 function update(delta: number) {
-  rectangle.y += rectangle.speed * delta / 1000
-  
-  if (rectangle.y > canvas.height) {
-    rectangle.y = -rectangle.height
-  }
+  gameState.update(delta)
+  uiController.updateUI()
 }
 
 function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-  
-  ctx.fillStyle = '#4f46e5'
-  ctx.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height)
+  gameState.render(ctx)
 }
 
 MainLoop.setUpdate(update).setDraw(draw).start()

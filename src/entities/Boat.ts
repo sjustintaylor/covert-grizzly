@@ -3,15 +3,14 @@ export interface Position {
   y: number
 }
 
-export enum OrderType {
-  NO_SPEED = 'NO_SPEED',
-  HALF_SPEED = 'HALF_SPEED',
-  FULL_SPEED = 'FULL_SPEED',
-  HALF_LEFT = 'HALF_LEFT',
-  FULL_LEFT = 'FULL_LEFT',
-  HALF_RIGHT = 'HALF_RIGHT',
-  FULL_RIGHT = 'FULL_RIGHT'
-}
+export type OrderType =
+  | 'NO_SPEED'
+  | 'HALF_SPEED'
+  | 'FULL_SPEED'
+  | 'HALF_LEFT'
+  | 'FULL_LEFT'
+  | 'HALF_RIGHT'
+  | 'FULL_RIGHT'
 
 export interface Order {
   type: OrderType
@@ -28,7 +27,6 @@ export class Boat {
   public orderQueue: Order[] = []
 
   private readonly maxSpeed: number = 100
-  private readonly turnSpeed: number = 2
 
   constructor(x: number, y: number) {
     this.position = { x, y }
@@ -76,26 +74,26 @@ export class Boat {
     const turnMultiplier = this.getTurnMultiplier()
 
     switch (this.currentOrder.type) {
-      case OrderType.NO_SPEED:
+      case 'NO_SPEED':
         this.velocity.x *= 0.9
         this.velocity.y *= 0.9
         break
-      case OrderType.HALF_SPEED:
+      case 'HALF_SPEED':
         this.velocity.y = -this.maxSpeed * speedMultiplier * 0.5
         break
-      case OrderType.FULL_SPEED:
+      case 'FULL_SPEED':
         this.velocity.y = -this.maxSpeed * speedMultiplier
         break
-      case OrderType.HALF_LEFT:
+      case 'HALF_LEFT':
         this.velocity.x = -this.maxSpeed * turnMultiplier * 0.5
         break
-      case OrderType.FULL_LEFT:
+      case 'FULL_LEFT':
         this.velocity.x = -this.maxSpeed * turnMultiplier
         break
-      case OrderType.HALF_RIGHT:
+      case 'HALF_RIGHT':
         this.velocity.x = this.maxSpeed * turnMultiplier * 0.5
         break
-      case OrderType.FULL_RIGHT:
+      case 'FULL_RIGHT':
         this.velocity.x = this.maxSpeed * turnMultiplier
         break
     }

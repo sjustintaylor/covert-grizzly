@@ -1,4 +1,4 @@
-import { Position } from './Boat'
+import type { Position } from './Boat'
 
 export class Target {
   public position: Position

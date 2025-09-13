@@ -2,17 +2,13 @@ import { Boat } from '../entities/Boat'
 import { Target } from '../entities/Target'
 import { OrderSystem } from './OrderSystem'
 
-export enum GameStatus {
-  PLAYING = 'PLAYING',
-  WON = 'WON',
-  PAUSED = 'PAUSED'
-}
+export type GameStatus = 'PLAYING' | 'WON' | 'PAUSED'
 
 export class GameState {
   public boat: Boat
   public target: Target
   public orderSystem: OrderSystem
-  public status: GameStatus = GameStatus.PLAYING
+  public status: GameStatus = 'PLAYING'
   public score: number = 0
   public gameStartTime: number
 
@@ -30,7 +26,7 @@ export class GameState {
   }
 
   public update(deltaTime: number): void {
-    if (this.status !== GameStatus.PLAYING) {
+    if (this.status !== 'PLAYING') {
       return
     }
 
@@ -48,7 +44,7 @@ export class GameState {
     this.target.render(ctx)
     this.boat.render(ctx)
 
-    if (this.status === GameStatus.WON) {
+    if (this.status === 'WON') {
       this.drawWinMessage(ctx)
     }
   }
@@ -116,7 +112,7 @@ export class GameState {
 
   private checkCollisions(): void {
     if (this.target.checkCollision(this.boat)) {
-      this.status = GameStatus.WON
+      this.status = 'WON'
       this.score = Math.max(0, 1000 - Math.floor((Date.now() - this.gameStartTime) / 100))
     }
   }
@@ -141,7 +137,7 @@ export class GameState {
   }
 
   public reset(): void {
-    this.status = GameStatus.PLAYING
+    this.status = 'PLAYING'
     this.score = 0
     this.gameStartTime = Date.now()
 
