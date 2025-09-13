@@ -1,17 +1,20 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Captain's Log - Naval Orders Game</title>
-  </head>
-  <body>
-    <div id="game-container">
-      <div id="canvas-container">
-        <canvas id="canvas" width="800" height="400"></canvas>
-      </div>
 
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Captain's Log - Naval Orders Game</title>
+</head>
+
+<body>
+  <div id="game-container">
+    <div id="canvas-container">
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <div id="controls-panel">
       <div id="controls-container">
         <div id="speed-controls">
           <button id="no-speed" class="order-btn speed-btn">No speed</button>
@@ -43,7 +46,9 @@
         <div id="game-state">Navigate the boat to the target!</div>
       </div>
     </div>
+  </div>
 
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>

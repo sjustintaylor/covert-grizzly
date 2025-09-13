@@ -6,8 +6,38 @@ import { UIController } from './ui/UIController'
 const canvas = document.querySelector<HTMLCanvasElement>('#canvas')!
 const ctx = canvas.getContext('2d')!
 
-const gameState = new GameState(canvas.width, canvas.height)
-const uiController = new UIController(gameState.orderSystem, gameState)
+let gameState: GameState
+let uiController: UIController
+
+function resizeCanvas() {
+  const container = document.querySelector('#canvas-container')!
+  const containerRect = container.getBoundingClientRect()
+
+  const newWidth = containerRect.width - 40 // Account for padding and border
+  const newHeight = containerRect.height - 40
+
+  // Set canvas size to match the container
+  canvas.width = newWidth
+  canvas.height = newHeight
+
+  // Set the actual display size via CSS (should already be handled by CSS)
+  canvas.style.width = '100%'
+  canvas.style.height = '100%'
+
+  // Update game state if it exists
+  if (gameState) {
+    gameState.resize(newWidth, newHeight)
+  }
+}
+
+// Initial resize
+resizeCanvas()
+
+// Handle window resize
+window.addEventListener('resize', resizeCanvas)
+
+gameState = new GameState(canvas.width, canvas.height)
+uiController = new UIController(gameState.orderSystem, gameState)
 
 function update(delta: number) {
   gameState.update(delta)

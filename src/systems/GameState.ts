@@ -149,4 +149,21 @@ export class GameState {
   public getGameTime(): number {
     return Date.now() - this.gameStartTime
   }
+
+  public resize(newWidth: number, newHeight: number): void {
+    const oldWidth = this.canvasWidth
+    const oldHeight = this.canvasHeight
+
+    this.canvasWidth = newWidth
+    this.canvasHeight = newHeight
+
+    // Scale boat position proportionally
+    this.boat.position.x = (this.boat.position.x / oldWidth) * newWidth
+    this.boat.position.y = (this.boat.position.y / oldHeight) * newHeight
+
+    // Update target position and bounds
+    this.target.position.x = (this.target.position.x / oldWidth) * newWidth
+    this.target.position.y = (this.target.position.y / oldHeight) * newHeight
+    this.target.setBounds(newWidth)
+  }
 }

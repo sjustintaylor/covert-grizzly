@@ -5,7 +5,7 @@ export class Target {
   public readonly radius: number = 25
   private velocity: number = 30
   private direction: number = 1
-  private readonly canvasWidth: number
+  private canvasWidth: number
 
   constructor(x: number, y: number, canvasWidth: number) {
     this.position = { x, y }
@@ -41,5 +41,9 @@ export class Target {
 
     const minDistance = this.radius + Math.max(other.width, other.height) / 2
     return distance < minDistance
+  }
+
+  public setBounds(newCanvasWidth: number): void {
+    this.canvasWidth = newCanvasWidth
   }
 }
