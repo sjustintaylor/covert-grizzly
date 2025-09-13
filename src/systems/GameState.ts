@@ -50,41 +50,20 @@ export class GameState {
   }
 
   private drawGameCanvas(ctx: CanvasRenderingContext2D): void {
-    ctx.fillStyle = '#E6F3FF'
+    // Create clean ocean background with subtle gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, this.canvasHeight)
+    gradient.addColorStop(0, '#3B82F6')
+    gradient.addColorStop(1, '#1E40AF')
+
+    ctx.fillStyle = gradient
     ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
 
-    const pattern = ctx.createPattern(this.createWaterPattern(), 'repeat')
-    if (pattern) {
-      ctx.fillStyle = pattern
-      ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
-    }
-
-    ctx.strokeStyle = '#2C3E50'
-    ctx.lineWidth = 2
+    // Clean subtle border
+    ctx.strokeStyle = '#1F2937'
+    ctx.lineWidth = 1
     ctx.strokeRect(0, 0, this.canvasWidth, this.canvasHeight)
-
-    ctx.fillStyle = '#34495E'
-    ctx.font = '16px Arial'
-    ctx.fillText('Game canvas', this.canvasWidth / 2 - 50, this.canvasHeight / 2)
   }
 
-  private createWaterPattern(): HTMLCanvasElement {
-    const patternCanvas = document.createElement('canvas')
-    patternCanvas.width = 20
-    patternCanvas.height = 20
-    const patternCtx = patternCanvas.getContext('2d')!
-
-    patternCtx.strokeStyle = '#D4EDDA'
-    patternCtx.lineWidth = 1
-    patternCtx.beginPath()
-    patternCtx.moveTo(0, 0)
-    patternCtx.lineTo(20, 20)
-    patternCtx.moveTo(20, 0)
-    patternCtx.lineTo(0, 20)
-    patternCtx.stroke()
-
-    return patternCanvas
-  }
 
   private keepBoatInBounds(): void {
     const margin = 10

@@ -35,19 +35,14 @@ body {
 }
 
 #canvas {
-  border: 3px solid #2C3E50;
-  border-radius: 15px;
-  background: repeating-linear-gradient(
-    45deg,
-    #E8F6F3,
-    #E8F6F3 10px,
-    #D5EDEA 10px,
-    #D5EDEA 20px
-  );
+  border: 2px solid #34495E;
+  border-radius: 8px;
+  background: #F8FAFC;
   width: 100%;
   height: 100%;
   max-height: calc(66.67vh - 20px);
   object-fit: contain;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 #controls-panel {
@@ -57,10 +52,11 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: white;
-  border-top: 3px solid #2C3E50;
+  background: #FFFFFF;
+  border-top: 1px solid #E5E7EB;
   padding: 20px 0;
   box-sizing: border-box;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
 }
 
 #controls-container {
@@ -91,14 +87,14 @@ body {
 #order-progress-label {
   font-size: 14px;
   font-weight: 500;
-  color: #2C3E50;
+  color: #374151;
 }
 
 #order-progress-bar {
   width: 200px;
   height: 20px;
-  background: #BDC3C7;
-  border: 2px solid #2C3E50;
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
   border-radius: 10px;
   overflow: hidden;
   position: relative;
@@ -106,10 +102,10 @@ body {
 
 #order-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #3498DB, #2980B9);
+  background: linear-gradient(90deg, #3B82F6, #2563EB);
   width: 0%;
   transition: width 0.1s ease-out;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 #turn-controls {
@@ -130,37 +126,34 @@ body {
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
-  border: 2px solid #2C3E50;
-  border-radius: 10px;
+  border: 2px solid #475569;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   min-width: 100px;
   text-align: center;
-  background: repeating-linear-gradient(
-    45deg,
-    #F8F9FA,
-    #F8F9FA 8px,
-    #E9ECEF 8px,
-    #E9ECEF 16px
-  );
+  background: #F1F5F9;
+  color: #334155;
 }
 
 .order-btn:hover {
-  background: #3498DB;
+  background: #3B82F6;
   color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-color: #2563EB;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
 }
 
 .order-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
 .order-btn.active {
-  background: #E74C3C;
+  background: #EF4444;
   color: white;
-  border-color: #C0392B;
+  border-color: #DC2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 #game-status {
@@ -168,21 +161,22 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  padding: 15px;
-  background: #F8F9FA;
-  border: 2px solid #2C3E50;
-  border-radius: 10px;
+  padding: 16px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
   width: 100%;
   max-width: 400px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 #current-order {
   font-weight: 600;
-  color: #2C3E50;
+  color: #1F2937;
   font-size: 16px;
 }
 
 #game-state {
-  color: #7F8C8D;
+  color: #6B7280;
   font-size: 14px;
 }
