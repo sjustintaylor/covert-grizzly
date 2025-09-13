@@ -67,26 +67,22 @@ export class GameState {
 
 
   private keepBoatInBounds(): void {
-    const margin = 10
-
-    if (this.boat.position.x - this.boat.width / 2 < margin) {
-      this.boat.position.x = margin + this.boat.width / 2
-      this.boat.velocity.x = 0
+    // Wrap horizontally (left/right edges)
+    if (this.boat.position.x + this.boat.width / 2 < 0) {
+      this.boat.position.x = this.canvasWidth + this.boat.width / 2
     }
 
-    if (this.boat.position.x + this.boat.width / 2 > this.canvasWidth - margin) {
-      this.boat.position.x = this.canvasWidth - margin - this.boat.width / 2
-      this.boat.velocity.x = 0
+    if (this.boat.position.x - this.boat.width / 2 > this.canvasWidth) {
+      this.boat.position.x = -this.boat.width / 2
     }
 
-    if (this.boat.position.y - this.boat.height / 2 < margin) {
-      this.boat.position.y = margin + this.boat.height / 2
-      this.boat.velocity.y = 0
+    // Wrap vertically (top/bottom edges)
+    if (this.boat.position.y + this.boat.height / 2 < 0) {
+      this.boat.position.y = this.canvasHeight + this.boat.height / 2
     }
 
-    if (this.boat.position.y + this.boat.height / 2 > this.canvasHeight - margin) {
-      this.boat.position.y = this.canvasHeight - margin - this.boat.height / 2
-      this.boat.velocity.y = 0
+    if (this.boat.position.y - this.boat.height / 2 > this.canvasHeight) {
+      this.boat.position.y = -this.boat.height / 2
     }
   }
 

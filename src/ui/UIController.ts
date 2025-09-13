@@ -28,9 +28,7 @@ export class UIController {
       { id: 'no-speed', orderType: 'NO_SPEED' as OrderType },
       { id: 'half-speed', orderType: 'HALF_SPEED' as OrderType },
       { id: 'full-speed', orderType: 'FULL_SPEED' as OrderType },
-      { id: 'half-left', orderType: 'HALF_LEFT' as OrderType },
       { id: 'full-left', orderType: 'FULL_LEFT' as OrderType },
-      { id: 'half-right', orderType: 'HALF_RIGHT' as OrderType },
       { id: 'full-right', orderType: 'FULL_RIGHT' as OrderType }
     ]
 
@@ -107,10 +105,8 @@ export class UIController {
       case 'NO_SPEED': return 'No Speed'
       case 'HALF_SPEED': return 'Half Speed'
       case 'FULL_SPEED': return 'Full Speed'
-      case 'HALF_LEFT': return '1/2 Left'
-      case 'FULL_LEFT': return 'Full Left'
-      case 'HALF_RIGHT': return '1/2 Right'
-      case 'FULL_RIGHT': return 'Full Right'
+      case 'FULL_LEFT': return 'Turn Left'
+      case 'FULL_RIGHT': return 'Turn Right'
       default: return 'Unknown'
     }
   }

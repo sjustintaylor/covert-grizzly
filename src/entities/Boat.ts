@@ -7,9 +7,7 @@ export type OrderType =
   | "NO_SPEED"
   | "HALF_SPEED"
   | "FULL_SPEED"
-  | "HALF_LEFT"
   | "FULL_LEFT"
-  | "HALF_RIGHT"
   | "FULL_RIGHT";
 
 export interface Order {
@@ -32,8 +30,8 @@ export class Boat {
   public currentSpeed: number = 0; // current forward speed
   public targetSpeed: number = 0; // target speed to reach
 
-  private readonly maxSpeed: number = 100;
-  private readonly maxAngularVelocity: number = 2.5; // radians per second
+  private readonly maxSpeed: number = 50;
+  private readonly turnAngularVelocity: number = 0.1746; // 15 degrees in 3 seconds
   private readonly speedAcceleration: number = 120; // units per second^2
   private readonly angularDamping: number = 0.85; // damping factor for angular velocity
 
@@ -42,7 +40,7 @@ export class Boat {
     this.velocity = { x: 0, y: 0 };
   }
 
-  public addOrder(orderType: OrderType, duration: number = 3000): void {
+  public addOrder(orderType: OrderType, duration: number = 1500): void {
     const order: Order = {
       type: orderType,
       duration,
@@ -88,17 +86,11 @@ export class Boat {
       case "FULL_SPEED":
         this.targetSpeed = this.maxSpeed;
         break;
-      case "HALF_LEFT":
-        this.angularVelocity = -this.maxAngularVelocity * 0.5;
-        break;
       case "FULL_LEFT":
-        this.angularVelocity = -this.maxAngularVelocity;
-        break;
-      case "HALF_RIGHT":
-        this.angularVelocity = this.maxAngularVelocity * 0.5;
+        this.angularVelocity = -this.turnAngularVelocity;
         break;
       case "FULL_RIGHT":
-        this.angularVelocity = this.maxAngularVelocity;
+        this.angularVelocity = this.turnAngularVelocity;
         break;
     }
   }
@@ -129,7 +121,9 @@ export class Boat {
       this.currentSpeed += acceleration;
 
       // Clamp to target speed if we've overshot
-      if (Math.sign(speedDiff) !== Math.sign(this.targetSpeed - this.currentSpeed)) {
+      if (
+        Math.sign(speedDiff) !== Math.sign(this.targetSpeed - this.currentSpeed)
+      ) {
         this.currentSpeed = this.targetSpeed;
       }
     } else {
@@ -142,7 +136,8 @@ export class Boat {
     this.rotation += this.angularVelocity * dt;
 
     // Keep rotation in 0 to 2π range
-    this.rotation = ((this.rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    this.rotation =
+      ((this.rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
 
     // Apply damping when no turn order is active
     if (!this.currentOrder || !this.isTurnOrder(this.currentOrder.type)) {
@@ -154,8 +149,7 @@ export class Boat {
   }
 
   private isTurnOrder(orderType: OrderType): boolean {
-    return orderType === "HALF_LEFT" || orderType === "FULL_LEFT" ||
-           orderType === "HALF_RIGHT" || orderType === "FULL_RIGHT";
+    return orderType === "FULL_LEFT" || orderType === "FULL_RIGHT";
   }
 
   public render(ctx: CanvasRenderingContext2D): void {
@@ -171,7 +165,12 @@ export class Boat {
 
     // Draw boat cabin (inner rectangle)
     ctx.fillStyle = "#FF1493";
-    ctx.fillRect(-this.width / 2 + 5, -this.height / 2 + 5, this.width - 10, this.height - 10);
+    ctx.fillRect(
+      -this.width / 2 + 5,
+      -this.height / 2 + 5,
+      this.width - 10,
+      this.height - 10
+    );
 
     // Draw bow (pointed front)
     ctx.fillStyle = "#FF1493";
