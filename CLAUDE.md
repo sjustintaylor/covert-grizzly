@@ -43,3 +43,4 @@ Strict TypeScript configuration with:
 
 ## Resources
 - MainLoop.js API docs: https://icecreamyou.github.io/MainLoop.js/docs/#!/api/MainLoop
+- Stop running "pnpm dev" or "task dev" to test the code. Just rely on "task build"
