@@ -1,4 +1,4 @@
-# Captain's Log
+# Covert Grizzly
 
 A naval command and control prototype built with TypeScript, Vite, and HTML5 Canvas. This project demonstrates an orders-based interface system where players issue commands to a naval vessel through a realistic command structure with preparation times and physics-based movement.
 
