@@ -1,0 +1,1 @@
+Let's remove the "half left"/"half right" buttons, and rename the remaining two turn buttons to be "turn left" and "turn right" respectively. Let's also update the effect. Currently the boat spins almost 360 degrees. I would like each turn command to turn the boat only about 15 degrees at a time.

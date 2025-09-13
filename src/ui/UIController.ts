@@ -69,15 +69,11 @@ export class UIController {
 
   private updateProgressBar(): void {
     const progress = this.orderSystem.getOrderProgress()
-    const isInPreparation = this.orderSystem.isInPreparation()
 
     this.progressBar.style.width = `${progress * 100}%`
+    this.progressBar.style.background = 'linear-gradient(90deg, #3B82F6, #2563EB)'
 
-    if (isInPreparation) {
-      this.progressBar.style.background = 'linear-gradient(90deg, #F59E0B, #D97706)'
-      this.progressLabel.textContent = 'Preparing Order...'
-    } else if (this.orderSystem.getCurrentOrder()) {
-      this.progressBar.style.background = 'linear-gradient(90deg, #3B82F6, #2563EB)'
+    if (this.orderSystem.getCurrentOrder()) {
       this.progressLabel.textContent = 'Executing Order...'
     } else {
       this.progressLabel.textContent = 'Order Progress'
@@ -86,11 +82,9 @@ export class UIController {
 
   private updateCurrentOrder(): void {
     const currentOrder = this.orderSystem.getCurrentOrder()
-    const isInPreparation = this.orderSystem.isInPreparation()
 
     if (currentOrder) {
-      const prefix = isInPreparation ? 'Preparing:' : 'Executing:'
-      this.currentOrderDisplay.textContent = `${prefix} ${this.formatOrderType(currentOrder)}`
+      this.currentOrderDisplay.textContent = `Executing: ${this.formatOrderType(currentOrder)}`
     } else {
       this.currentOrderDisplay.textContent = 'Current Order: None'
     }
